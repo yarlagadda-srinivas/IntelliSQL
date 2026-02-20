@@ -1,0 +1,24 @@
+def get_sql_query(question):
+    models_to_try = [
+        "models/gemini-pro",
+        "models/gemini-1.5-pro-latest",
+        "models/gemini-1.5-flash-latest",
+        "gemini-pro",
+        "gemini-1.0-pro",
+        "tunedModels/gemini-pro"  # Sometimes this works
+    ]
+    
+    for model_name in models_to_try:
+        try:
+            st.write(f"Trying: {model_name}")  # Debug message
+            model = genai.GenerativeModel(model_name)
+            response = model.generate_content([prompt[0], question])
+            sql = response.text.replace("```sql", "").replace("```", "").strip()
+            st.success(f"✅ Success with: {model_name}")
+            return sql
+        except Exception as e:
+            st.write(f"❌ Failed: {model_name} - {str(e)[:50]}")
+            continue
+    
+    st.error("All models failed!")
+    return "SELECT * FROM STUDENTS;"
